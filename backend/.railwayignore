@@ -1,0 +1,6 @@
+# Don't upload training script or raw data — models are already trained
+ml_pipeline/train_model.py
+ml_pipeline/output.txt
+__pycache__/
+*.pyc
+.env
