@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 // Backend URL configuration:
 // 127.0.0.1:8001 -> Works via USB tethering with ADB reverse
-const String kApiBaseUrl = "http://127.0.0.1:8001";
+const String kApiBaseUrl = "https://weatherapp-production-a97e.up.railway.app";
 
 const String kSupabaseUrl = "https://adhurvteedivsvehjuba.supabase.co";
 // NOTE: Use anon key for client-side Flutter, not service role key!

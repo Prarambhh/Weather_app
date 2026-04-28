@@ -226,6 +226,9 @@ async def _compute_score_for_location(client: httpx.AsyncClient, loc_id: str) ->
     final_score = base_safeness
     status_text = build_status_text(int(final_score), False, 0, 0)
     
+    hazard_count = 0
+    clear_count = 0
+    
     # Severity-based scoring
     if len(reports) >= 2:
         total_penalty = 0
