@@ -232,20 +232,30 @@ async def _compute_score_for_location(client: httpx.AsyncClient, loc_id: str) ->
     # Severity-based scoring
     if len(reports) >= 2:
         total_penalty = 0
+        severe_conditions = set()
+        
         for r in reports:
             penalty = 0
             # Rainfall severity weights
             rain = r.get("rainfall", "No Rainfall")
             if rain == "Low Rainfall": penalty += 10
             elif rain == "Medium": penalty += 25
-            elif rain == "High": penalty += 50
-            elif rain == "Very High": penalty += 75
+            elif rain == "High": 
+                penalty += 50
+                severe_conditions.add("High Rainfall")
+            elif rain == "Very High": 
+                penalty += 75
+                severe_conditions.add("Very High Rainfall")
             
             # Visibility severity weights
-            if r.get("visibility") == "Low": penalty += 40
+            if r.get("visibility") == "Low": 
+                penalty += 40
+                severe_conditions.add("Low Visibility")
             
             # Temperature severity weights
-            if r.get("temperature") == "Very High": penalty += 15
+            if r.get("temperature") == "Very High": 
+                penalty += 15
+                severe_conditions.add("Extreme Heat")
             
             total_penalty += penalty
             
@@ -254,12 +264,15 @@ async def _compute_score_for_location(client: httpx.AsyncClient, loc_id: str) ->
         # Apply the exact crowd severity penalty to the score
         final_score = base_safeness - average_penalty
         
+        # Build dynamic reason string
+        reason_str = " and ".join(list(severe_conditions)) if severe_conditions else "Hazards"
+        
         # Update the status text based on how severe the crowd penalty was
         if average_penalty >= 50:
-            status_text = "⚠️ Override: Severe Hazards Reported by Community"
+            status_text = f"⚠️ Override: {reason_str} reported by community"
             is_overridden = True
         elif average_penalty >= 20:
-            status_text = "⚠️ Caution: Moderate Hazards Reported by Community"
+            status_text = f"⚠️ Caution: {reason_str} reported by community"
             is_overridden = True
         elif average_penalty == 0 and len(reports) >= 3:
             # If multiple users confirm perfectly clear conditions
